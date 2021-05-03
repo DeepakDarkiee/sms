@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
+from .models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
 from .forms import AddStudentForm, EditStudentForm
 
 
@@ -104,16 +104,13 @@ def add_staff_save(request):
         password = request.POST.get('password')
         address = request.POST.get('address')
 
-        try:
-            user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=2)
-            user.staffs.address = address
-            user.save()
-            messages.success(request, "Staff Added Successfully!")
-            return redirect('add_staff')
-        except:
-            messages.error(request, "Failed to Add Staff!")
-            return redirect('add_staff')
-
+        
+        user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=2)
+        user.staffs.address = address
+        user.save()
+        messages.success(request, "Staff Added Successfully!")
+        return redirect('add_staff')
+        
 
 
 def manage_staff(request):
@@ -145,38 +142,33 @@ def edit_staff_save(request):
         last_name = request.POST.get('last_name')
         address = request.POST.get('address')
 
-        try:
+       
             # INSERTING into Customuser Model
-            user = CustomUser.objects.get(id=staff_id)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.email = email
-            user.username = username
-            user.save()
+        user = CustomUser.objects.get(id=staff_id)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.username = username
+        user.save()
             
             # INSERTING into Staff Model
-            staff_model = Staffs.objects.get(admin=staff_id)
-            staff_model.address = address
-            staff_model.save()
+        staff_model = Staffs.objects.get(admin=staff_id)
+        staff_model.address = address
+        staff_model.save()
 
-            messages.success(request, "Staff Updated Successfully.")
-            return redirect('/edit_staff/'+staff_id)
+        messages.success(request, "Staff Updated Successfully.")
+        return redirect('/edit_staff/'+staff_id)
 
-        except:
-            messages.error(request, "Failed to Update Staff.")
-            return redirect('/edit_staff/'+staff_id)
+       
 
 
 
 def delete_staff(request, staff_id):
     staff = Staffs.objects.get(admin=staff_id)
-    try:
-        staff.delete()
-        messages.success(request, "Staff Deleted Successfully.")
-        return redirect('manage_staff')
-    except:
-        messages.error(request, "Failed to Delete Staff.")
-        return redirect('manage_staff')
+    staff.delete()
+    messages.success(request, "Staff Deleted Successfully.")
+    return redirect('manage_staff')
+    
 
 
 
@@ -191,15 +183,12 @@ def add_course_save(request):
         return redirect('add_course')
     else:
         course = request.POST.get('course')
-        try:
-            course_model = Courses(course_name=course)
-            course_model.save()
-            messages.success(request, "Course Added Successfully!")
-            return redirect('add_course')
-        except:
-            messages.error(request, "Failed to Add Course!")
-            return redirect('add_course')
-
+        
+        course_model = Courses(course_name=course)
+        course_model.save()
+        messages.success(request, "Course Added Successfully!")
+        return redirect('add_course')
+        
 
 def manage_course(request):
     courses = Courses.objects.all()
@@ -225,29 +214,24 @@ def edit_course_save(request):
         course_id = request.POST.get('course_id')
         course_name = request.POST.get('course')
 
-        try:
-            course = Courses.objects.get(id=course_id)
-            course.course_name = course_name
-            course.save()
+        
+        course = Courses.objects.get(id=course_id)
+        course.course_name = course_name
+        course.save()
 
-            messages.success(request, "Course Updated Successfully.")
-            return redirect('/edit_course/'+course_id)
+        messages.success(request, "Course Updated Successfully.")
+        return redirect('/edit_course/'+course_id)
 
-        except:
-            messages.error(request, "Failed to Update Course.")
-            return redirect('/edit_course/'+course_id)
+        
 
 
 def delete_course(request, course_id):
     course = Courses.objects.get(id=course_id)
-    try:
-        course.delete()
-        messages.success(request, "Course Deleted Successfully.")
-        return redirect('manage_course')
-    except:
-        messages.error(request, "Failed to Delete Course.")
-        return redirect('manage_course')
-
+    
+    course.delete()
+    messages.success(request, "Course Deleted Successfully.")
+    return redirect('manage_course')
+    
 
 def manage_session(request):
     session_years = SessionYearModel.objects.all()
@@ -269,14 +253,14 @@ def add_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
 
-        try:
-            sessionyear = SessionYearModel(session_start_year=session_start_year, session_end_year=session_end_year)
-            sessionyear.save()
-            messages.success(request, "Session Year added Successfully!")
-            return redirect("add_session")
-        except:
-            messages.error(request, "Failed to Add Session Year")
-            return redirect("add_session")
+        
+        sessionyear = SessionYearModel(session_start_year=session_start_year, session_end_year=session_end_year)
+        sessionyear.save()
+        messages.success(request, "Session Year added Successfully!")
+        return redirect("add_session")
+        # except:
+        #     messages.error(request, "Failed to Add Session Year")
+        #     return redirect("add_session")
 
 
 def edit_session(request, session_id):
@@ -296,17 +280,17 @@ def edit_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
 
-        try:
-            session_year = SessionYearModel.objects.get(id=session_id)
-            session_year.session_start_year = session_start_year
-            session_year.session_end_year = session_end_year
-            session_year.save()
+       
+        session_year = SessionYearModel.objects.get(id=session_id)
+        session_year.session_start_year = session_start_year
+        session_year.session_end_year = session_end_year
+        session_year.save()
 
-            messages.success(request, "Session Year Updated Successfully.")
-            return redirect('/edit_session/'+session_id)
-        except:
-            messages.error(request, "Failed to Update Session Year.")
-            return redirect('/edit_session/'+session_id)
+        messages.success(request, "Session Year Updated Successfully.")
+        return redirect('/edit_session/'+session_id)
+        # except:
+        #     messages.error(request, "Failed to Update Session Year.")
+        #     return redirect('/edit_session/'+session_id)
 
 
 def delete_session(request, session_id):
@@ -360,24 +344,23 @@ def add_student_save(request):
                 profile_pic_url = None
 
 
-            try:
-                user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=3)
-                user.students.address = address
+            
+            user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=3)
+            user.students.address = address
 
-                course_obj = Courses.objects.get(id=course_id)
-                user.students.course_id = course_obj
+            course_obj = Courses.objects.get(id=course_id)
+            user.students.course_id = course_obj
 
-                session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-                user.students.session_year_id = session_year_obj
+            session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+            user.students.session_year_id = session_year_obj
 
-                user.students.gender = gender
-                user.students.profile_pic = profile_pic_url
-                user.save()
-                messages.success(request, "Student Added Successfully!")
-                return redirect('add_student')
-            except:
-                # messages.error(request, "Failed to Add Student!")
-                return redirect('add_student')
+            user.students.gender = gender
+            user.students.profile_pic = profile_pic_url
+            user.save()
+            messages.success(request, "Student Added Successfully!")
+            return redirect('add_student')
+            
+            # messages.error(request, "Failed to Add Student!")
         else:
             return redirect('add_student')
 
